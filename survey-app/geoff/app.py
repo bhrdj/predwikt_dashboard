@@ -101,6 +101,7 @@ def load_data():
 
 #     return chart
 
+@cache
 def model_fit(ts,p_AR_parameter,moving_average,target_names,calendar_cols):
     ts_lags = ts.copy()
 
@@ -138,15 +139,20 @@ def model_fit(ts,p_AR_parameter,moving_average,target_names,calendar_cols):
         ytr[diz] = YYtr[ycols[diz]]
         yvl[diz] = YYvl[ycols[diz]]
 
-    ri, gs_ri, scores = {}, {},{}
+    ri, gs_ri, scores = {}, {}, {}
     for diz in Xtr:
         ri[diz] = Ridge()
         gs_ri[diz] = GridSearchCV(ri[diz], {'alpha': [-100,-10,0,10,100]})
         gs_ri[diz].fit(Xtr[diz],ytr[diz])
         scores[diz] = gs_ri[diz].score(Xvl[diz],yvl[diz])
+
         # print((diz, gs_ri[diz].score(Xvl[diz],yvl[diz]), gs_ri[diz].best_params_))
-    
-    return gs_ri,scores
+        
+    return gs_ri,scores,XX,YY,Xcols
+
+def model_plot(gs_ri,XX,YY,Xcols,target_names):
+    for diz in target_names:
+        YY_pred = gs_ri[diz].best_estimator_.pred(XX[Xcols])
 
 def main():
     # load data - should only happen once
@@ -175,12 +181,14 @@ def main():
             options=range(7,14)
         )
 
-        submitted = st.sidebar.form_submit_button("Compute!")
+        submitted = st.form_submit_button("Compute!")
     
     gs_ri,scores = model_fit(ts,p_AR_parameter,moving_average,target_names,calendar_cols)
     
     for diz in target_names:
         st.write(f"{diz}: {scores[diz]}")
+    
+
 
     # produce a chart
     #st.write(chart_data(data,disasters).head())
