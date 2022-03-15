@@ -1,12 +1,13 @@
-import pickle
 import pandas as pd
 import numpy as np
-import streamlit as st
 import datetime
-#  import altair as alt
 from holidays_jp import CountryHolidays
 from sklearn.linear_model import Ridge
 from sklearn.model_selection import GridSearchCV
+import pickle
+import streamlit as st
+#  import altair as alt
+import matplotlib.pyplot as plt
 
 @st.cache
 def load_data():
@@ -47,63 +48,6 @@ def load_data():
 def instantiate_results(counter):
     results = []
     return results
-
-
-# def chart_data(data,disasters):
-#     #filter
-#     data_prep = data.loc[:,disasters].copy()
-
-#     #transform
-#     data_prep.reset_index(inplace=True) # get the column as a selectable field, named 'day'
-#     source = pd.melt(data_prep,id_vars='day',value_vars=disasters,var_name='disaster',value_name='edits')
-
-#     # plot
-#     # https://altair-viz.github.io/gallery/multiline_tooltip.html
-#     nearest = alt.selection(type='single', nearest=True, on='mouseover',
-#                         fields=['day'], empty='none')
-
-#     # The basic line
-#     line = alt.Chart(source).mark_line().encode(
-#         x='day',
-#         y='edits',
-#         color='disaster'
-
-#     )
-
-#     # Transparent selectors across the chart. This is what tells us
-#     # the x-value of the cursor
-#     selectors = alt.Chart(source).mark_point().encode(
-#         x='day:Q',
-#         opacity=alt.value(0),
-#     ).add_selection(
-#         nearest
-#     )
-
-#     # Draw points on the line, and highlight based on selection
-#     points = line.mark_point().encode(
-#         opacity=alt.condition(nearest, alt.value(1), alt.value(0))
-#     )
-
-#     # Draw text labels near the points, and highlight based on selection
-#     text = line.mark_text(align='left', dx=5, dy=-5).encode(
-#         text=alt.condition(nearest, 'edits:Q', alt.value(' '))
-#     )
-
-#     # Draw a rule at the location of the selection
-#     rules = alt.Chart(source).mark_rule(color='gray').encode(
-#         x='day:Q',
-#     ).transform_filter(
-#         nearest
-#     )
-
-#     # Put the five layers into a chart and bind the data
-#     chart = alt.layer(
-#         line, selectors, points, rules, text
-#     ).properties(
-#         width=600, height=300
-#     )
-
-#     return chart
 
 def model_prep(target_names,ts,p_AR_parameter,moving_average):
     ts_lags = ts.copy()
@@ -158,14 +102,10 @@ def model_fit(ts,p_AR_parameter,moving_average,target_names,calendar_cols):
         gs_ri[diz] = GridSearchCV(ri[diz], {'alpha': [-100,-10,0,10,100]})
         gs_ri[diz].fit(Xtr[diz],ytr[diz])
         scores[diz] = gs_ri[diz].score(Xvl[diz],yvl[diz])
-
-        # print((diz, gs_ri[diz].score(Xvl[diz],yvl[diz]), gs_ri[diz].best_params_))
         
     return gs_ri,scores,XX,YY,Xcols
 
 # def model_plot(gs_ri,target_names,ts):
-    
-    
 #     for diz in target_names:
 #         YY_pred = gs_ri[diz].best_estimator_.pred(XX[Xcols])
 
@@ -177,14 +117,7 @@ def grid_search():
     st.title("Manual Grid Search")
     # user input
     with st.form("inputs"):
-        # start_date = st.date_input(
-        #     "Start Date of Interest",
-        #     datetime.date(2019,1,1)
-        # )
-        # end_date = st.date_input(
-        #     "End Date of Interest",
-        #     datetime.date(2021,1,1)
-        # )
+
         target_names = st.multiselect(
             "Select your target",
             target_names_default,
@@ -210,17 +143,8 @@ def grid_search():
     for diz in target_names:
         result_dict[diz+'_score'] = scores[diz]
         st.write(f"{diz}: {scores[diz]:.2f}")
-
-    # if st.button("Refresh"):
-    #     counter += 1 
-
-    # results =  
     
-
-
-    # produce a chart
-    #st.write(chart_data(data,disasters).head())
-    # st.altair_chart(chart_data(data,disasters))
+    return result_dict
 
 def main():
     page = st.sidebar.selectbox('Choose your page',['Home','GridSearch'])
@@ -229,7 +153,8 @@ def main():
         st.markdown("""
         """)
     else:
-        grid_search()
+        result_dict = grid_search()
+        st.write(result_dict)
 
 if __name__ == "__main__":
     main()
