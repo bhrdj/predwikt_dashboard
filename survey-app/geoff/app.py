@@ -43,6 +43,10 @@ def load_data():
     calendar_cols = ['holiday_on_weekday','mtwtf','sat', 'sun',]
     return ts, list(disasters_english.values()), calendar_cols
 
+@st.cache
+def instantiate_results(counter):
+    results = []
+    return results
 
 
 # def chart_data(data,disasters):
@@ -101,8 +105,7 @@ def load_data():
 
 #     return chart
 
-@st.cache
-def model_fit(ts,p_AR_parameter,moving_average,target_names,calendar_cols):
+def model_prep(target_names,ts,p_AR_parameter,moving_average):
     ts_lags = ts.copy()
 
     lag_vars, μ_vars = [], []
@@ -119,15 +122,25 @@ def model_fit(ts,p_AR_parameter,moving_average,target_names,calendar_cols):
     XX = ts_lags[ts_lags.columns.difference(target_names)]
     YY = ts_lags[target_names]
 
+    return XX, YY
+
+def feature_columns(XX,target_names,calendar_cols):
+    Xcols = {}
+    for i in target_names:
+        Xcols[i] = XX.columns[XX.columns.str.startswith(i)].tolist() + calendar_cols
+    return Xcols
+
+@st.cache
+def model_fit(ts,p_AR_parameter,moving_average,target_names,calendar_cols):
+    XX,YY = model_prep(target_names,ts,p_AR_parameter,moving_average)
+
     start_tr = 0
     end_tr = 600
     end_vl = 800
     XXtr, YYtr = XX.copy().iloc[start_tr:end_tr], YY.iloc[start_tr:end_tr]
     XXvl, YYvl = XX.copy().iloc[end_tr:end_vl], YY.iloc[end_tr:end_vl]
 
-    Xcols = {}
-    for i in target_names:
-        Xcols[i] = XX.columns[XX.columns.str.startswith(i)].tolist() + calendar_cols
+    Xcols = feature_columns(XX,target_names,calendar_cols)
 
     ycols = {i:i for i in target_names}
 
@@ -150,14 +163,18 @@ def model_fit(ts,p_AR_parameter,moving_average,target_names,calendar_cols):
         
     return gs_ri,scores,XX,YY,Xcols
 
-def model_plot(gs_ri,XX,YY,Xcols,target_names):
-    for diz in target_names:
-        YY_pred = gs_ri[diz].best_estimator_.pred(XX[Xcols])
+# def model_plot(gs_ri,target_names,ts):
+    
+    
+#     for diz in target_names:
+#         YY_pred = gs_ri[diz].best_estimator_.pred(XX[Xcols])
 
-def main():
+# def result_plot():
+
+def grid_search():
     # load data - should only happen once
     ts, target_names_default, calendar_cols = load_data()
-    st.title("Define Model")
+    st.title("Manual Grid Search")
     # user input
     with st.form("inputs"):
         # start_date = st.date_input(
@@ -185,8 +202,19 @@ def main():
     
     gs_ri,scores,XX,YY,Xcols = model_fit(ts,p_AR_parameter,moving_average,target_names,calendar_cols)
     
+    result_dict = {}
+    result_dict['target_names'] = target_names
+    result_dict['p_AR_parameter'] = p_AR_parameter
+    result_dict['moving_average'] = moving_average
+
     for diz in target_names:
-        st.write(f"{diz}: {scores[diz]}")
+        result_dict[diz+'_score'] = scores[diz]
+        st.write(f"{diz}: {scores[diz]:.2f}")
+
+    # if st.button("Refresh"):
+    #     counter += 1 
+
+    # results =  
     
 
 
@@ -194,7 +222,14 @@ def main():
     #st.write(chart_data(data,disasters).head())
     # st.altair_chart(chart_data(data,disasters))
 
-
+def main():
+    page = st.sidebar.selectbox('Choose your page',['Home','GridSearch'])
+    if page == 'Home':
+        st.title("Steve's capstone")
+        st.markdown("""
+        """)
+    else:
+        grid_search()
 
 if __name__ == "__main__":
     main()
