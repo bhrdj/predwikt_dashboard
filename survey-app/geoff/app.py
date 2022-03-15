@@ -101,7 +101,7 @@ def load_data():
 
 #     return chart
 
-@cache
+@st.cache
 def model_fit(ts,p_AR_parameter,moving_average,target_names,calendar_cols):
     ts_lags = ts.copy()
 
@@ -183,7 +183,7 @@ def main():
 
         submitted = st.form_submit_button("Compute!")
     
-    gs_ri,scores = model_fit(ts,p_AR_parameter,moving_average,target_names,calendar_cols)
+    gs_ri,scores,XX,YY,Xcols = model_fit(ts,p_AR_parameter,moving_average,target_names,calendar_cols)
     
     for diz in target_names:
         st.write(f"{diz}: {scores[diz]}")
