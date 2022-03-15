@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import streamlit as st
 import datetime
-import altair as alt
+#  import altair as alt
 from holidays_jp import CountryHolidays
 from sklearn.linear_model import Ridge
 from sklearn.model_selection import GridSearchCV
