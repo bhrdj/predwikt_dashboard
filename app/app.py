@@ -158,7 +158,8 @@ def main():
         st.markdown("""
         """)
     else:
-        grid_search()
+        st.write('testing')
+        # grid_search()
 
 if __name__ == "__main__":
     main()
