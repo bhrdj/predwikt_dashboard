@@ -10,10 +10,10 @@ import streamlit as st
 import matplotlib.pyplot as plt
 import os
 
-# @st.cache
+@st.cache
 def load_data():
     # get data in memory
-    infile = open('./assets/disaster_daily_edits.pickle','rb') 
+    infile = open('assets/disaster_daily_edits.pickle','rb') 
     daily_edits = pickle.load(infile)
     infile.close()
 
@@ -46,9 +46,9 @@ def load_data():
     return ts, list(disasters_english.values()), calendar_cols
 
 # @st.cache
-def instantiate_results(counter):
-    results = []
-    return results
+# def instantiate_results(counter):
+#     results = []
+#     return results
 
 def model_prep(target_names,ts,p_AR_parameter,moving_average):
     ts_lags = ts.copy()
