@@ -37,7 +37,7 @@ def load_data():
     ts = ts.rename(columns=disasters_english)
     ts['mtwtf'] = ts.index.dayofweek.isin([0,1,2,3,4]).astype(int)
     ts['sat'] = ts.index.dayofweek.isin([5]).astype(int)
-    ts['sun'] = ts.index.dayofweek.isin([5]).astype(int)
+    ts['sun'] = ts.index.dayofweek.isin([6]).astype(int)
     ts['holiday'] = holidays['holiday']
     ts['holiday_on_weekday'] = ts[['holiday', 'mtwtf']].all(axis='columns').astype(int)
     ts = ts[ts.columns.difference(['holiday'])]
@@ -139,11 +139,27 @@ def grid_search():
     #     result_dict[diz+'_score'] = scores[diz]
     #     st.write(f"{diz}: {scores[diz]:.2f}")
     round_scores = {i:round(scores[i], 3) for i in scores}
-    st.write("Results")
+    st.write("Results: Quality of Fit")
     st.dataframe(pd.DataFrame(scores, index=['R²']))
+    st.write("Results: Model Coefficients")
+    st.dataframe(get_coeffs(gs_ri,target_names,p_AR_parameter,moving_average))
     st.write("Actual and Predicted Wikipedia Edits by Category")
     model_plot(result_dict, gs_ri,target_names,XX,YY,Xcols)
-
+    
+def get_coeffs(gs_ri,target_names,p_AR_parameter,moving_average):
+    coeffs = {}
+    AR_coeff_nums = list(range(1,p_AR_parameter+1))
+    AR_coeff_names = list(['lag_' + str(i) + '_days' for i in AR_coeff_nums])
+    average_coeff_name = ['μ'+str(moving_average)]
+    coeff_names = AR_coeff_names + average_coeff_name + ['holiday_on_weekday', 'mtwtf', 'sat', 'sun']
+    
+    for diz in gs_ri:
+        coeffs[diz] = pd.Series(
+            gs_ri[diz].best_estimator_.coef_, 
+            index=coeff_names, 
+            name=diz)
+    return pd.DataFrame(coeffs)
+    
 def model_plot(result_dict, gs_ri,target_names,XX,YY,Xcols):
     diz_colors = {'VolcanicDisaster':'red', 
                   'TropicalCyclones':'blue', 
@@ -167,9 +183,6 @@ def model_plot(result_dict, gs_ri,target_names,XX,YY,Xcols):
         ax.legend([actual, predicted], ['actual', 'predicted'])
     plt.xticks(rotation = 90)
     st.pyplot(fig)
-
-# def result_plot():
-
 
 def main():
     page = st.sidebar.selectbox('Choose your page',['Home','GridSearch'])
