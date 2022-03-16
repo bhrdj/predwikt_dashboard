@@ -142,11 +142,20 @@ def grid_search():
     model_plot(result_dict, gs_ri,target_names,XX,YY,Xcols)
 
 def model_plot(result_dict, gs_ri,target_names,XX,YY,Xcols):
-    fig = plt.figure(figsize=(8,4))
-    ax = fig.gca()
-    for diz in target_names:
+    diz_colors = {'VolcanicDisaster':'red', 
+                  'TropicalCyclones':'blue', 
+                  'SnowDamage':'black', 
+                  'Earthquake':'green', 
+                  'Tsunami':'purple'}
+    fig, axes = plt.subplots(nrows=len(target_names), ncols= 1, 
+                             figsize=(8,8), sharex=True)
+    for diz,ax in zip(target_names,axes):
         YY_pred = gs_ri[diz].best_estimator_.predict(XX[Xcols[diz]])
-        ax.plot(YY_pred)
+        YY_pred = pd.Series(YY_pred, index=XX[Xcols[diz]].index)
+        ax.plot(YY_pred, color=diz_colors[diz])
+        ax.set_ylabel(diz)
+        ax.yaxis.label.set_color(diz_colors[diz])
+    plt.xticks(rotation = 90)
     st.pyplot(fig)
 
 # def result_plot():
@@ -160,8 +169,6 @@ def main():
         """)
     else:
         import os
-        # st.write(os.listdir())
-        # st.write(os.getcwd())
         grid_search()
 
 if __name__ == "__main__":
