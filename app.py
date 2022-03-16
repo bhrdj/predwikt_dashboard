@@ -80,8 +80,8 @@ def model_fit(ts,p_AR_parameter,moving_average,target_names,calendar_cols):
     XX,YY = model_prep(target_names,ts,p_AR_parameter,moving_average)
 
     start_tr = 0
-    end_tr = 600
-    end_vl = 800
+    end_tr = 730
+    end_vl = XX.shape[0]
     XXtr, YYtr = XX.copy().iloc[start_tr:end_tr], YY.iloc[start_tr:end_tr]
     XXvl, YYvl = XX.copy().iloc[end_tr:end_vl], YY.iloc[end_tr:end_vl]
 
@@ -135,10 +135,13 @@ def grid_search():
     result_dict['p_AR_parameter'] = p_AR_parameter
     result_dict['moving_average'] = moving_average
 
-    for diz in target_names:
-        result_dict[diz+'_score'] = scores[diz]
-        st.write(f"{diz}: {scores[diz]:.2f}")
-    
+    # for diz in target_names:
+    #     result_dict[diz+'_score'] = scores[diz]
+    #     st.write(f"{diz}: {scores[diz]:.2f}")
+    round_scores = {i:round(scores[i], 3) for i in scores}
+    st.write("Results")
+    st.dataframe(pd.DataFrame(scores, index=['R²']))
+    st.write("Actual and Predicted Wikipedia Edits by Category")
     model_plot(result_dict, gs_ri,target_names,XX,YY,Xcols)
 
 def model_plot(result_dict, gs_ri,target_names,XX,YY,Xcols):
@@ -147,14 +150,21 @@ def model_plot(result_dict, gs_ri,target_names,XX,YY,Xcols):
                   'SnowDamage':'black', 
                   'Earthquake':'green', 
                   'Tsunami':'purple'}
+    diz_colors_light = {'VolcanicDisaster':'pink', 
+                  'TropicalCyclones':'lightblue', 
+                  'SnowDamage':'gray', 
+                  'Earthquake':'lightgreen', 
+                  'Tsunami':'violet'}
     fig, axes = plt.subplots(nrows=len(target_names), ncols= 1, 
                              figsize=(8,8), sharex=True)
     for diz,ax in zip(target_names,axes):
         YY_pred = gs_ri[diz].best_estimator_.predict(XX[Xcols[diz]])
-        YY_pred = pd.Series(YY_pred, index=XX[Xcols[diz]].index)
-        ax.plot(YY_pred, color=diz_colors[diz])
+        YY_pred = pd.Series(YY_pred, index=XX[Xcols[diz]].index, name="prediction")
+        actual, = ax.plot(YY[diz], color='gray', linestyle='dashed', alpha = .7)
+        predicted, = ax.plot(YY_pred, color=diz_colors[diz], alpha = 1)
         ax.set_ylabel(diz)
         ax.yaxis.label.set_color(diz_colors[diz])
+        ax.legend([actual, predicted], ['actual', 'predicted'])
     plt.xticks(rotation = 90)
     st.pyplot(fig)
 
