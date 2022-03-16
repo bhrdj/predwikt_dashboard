@@ -105,12 +105,6 @@ def model_fit(ts,p_AR_parameter,moving_average,target_names,calendar_cols):
         
     return gs_ri,scores,XX,YY,Xcols
 
-# def model_plot(gs_ri,target_names,ts):
-#     for diz in target_names:
-#         YY_pred = gs_ri[diz].best_estimator_.pred(XX[Xcols])
-
-# def result_plot():
-
 def grid_search():
     # load data - should only happen once
     ts, target_names_default, calendar_cols = load_data()
@@ -130,7 +124,7 @@ def grid_search():
             "select # of days for moving average",
             options=range(7,14)
         )
-
+        
         submitted = st.form_submit_button("Compute!")
     
     gs_ri,scores,XX,YY,Xcols = model_fit(ts,p_AR_parameter,moving_average,target_names,calendar_cols)
@@ -144,7 +138,18 @@ def grid_search():
         result_dict[diz+'_score'] = scores[diz]
         st.write(f"{diz}: {scores[diz]:.2f}")
     
-    return result_dict
+    model_plot(result_dict, gs_ri,target_names,XX,YY,Xcols)
+
+def model_plot(result_dict, gs_ri,target_names,XX,YY,Xcols):
+    fig = plt.figure(figsize=(8,4))
+    ax = fig.gca()
+    for diz in target_names:
+        YY_pred = gs_ri[diz].best_estimator_.predict(XX[Xcols[diz]])
+        ax.plot(YY_pred)
+    st.pyplot(fig)
+
+# def result_plot():
+
 
 def main():
     page = st.sidebar.selectbox('Choose your page',['Home','GridSearch'])
@@ -153,8 +158,7 @@ def main():
         st.markdown("""
         """)
     else:
-        result_dict = grid_search()
-        st.write(result_dict)
+        grid_search()
 
 if __name__ == "__main__":
     main()
