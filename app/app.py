@@ -8,11 +8,12 @@ import pickle
 import streamlit as st
 #  import altair as alt
 import matplotlib.pyplot as plt
+import os
 
 # @st.cache
 def load_data():
     # get data in memory
-    infile = open('assets/disaster_daily_edits.pickle','rb') 
+    infile = open('./app/assets/disaster_daily_edits.pickle','rb') 
     daily_edits = pickle.load(infile)
     infile.close()
 
@@ -159,7 +160,8 @@ def main():
         """)
     else:
         import os
-        st.write([i for i in os.walk('.')])
+        st.write(os.listdir())
+        st.write(os.getcwd())
         # grid_search()
 
 if __name__ == "__main__":
