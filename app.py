@@ -174,8 +174,12 @@ def model_plot(result_dict, gs_ri,target_names,XX,YY,Xcols):
 def main():
     page = st.sidebar.selectbox('Choose your page',['Home','GridSearch'])
     if page == 'Home':
-        st.title("Steve's capstone")
+        st.title("Forecasting Wikipedia Edits")
         st.markdown("""
+        Capstone Project  
+        Data Science 2021-2022  
+        General Assembly  
+        **Steven Bhardwaj**
         """)
     else:
         import os
