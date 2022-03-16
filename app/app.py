@@ -158,7 +158,8 @@ def main():
         st.markdown("""
         """)
     else:
-        st.write('testing')
+        import os
+        st.write([i for i in os.walk('.')])
         # grid_search()
 
 if __name__ == "__main__":
