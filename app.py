@@ -13,7 +13,7 @@ import os
 # @st.cache
 def load_data():
     # get data in memory
-    infile = open('./app/assets/disaster_daily_edits.pickle','rb') 
+    infile = open('./assets/disaster_daily_edits.pickle','rb') 
     daily_edits = pickle.load(infile)
     infile.close()
 
@@ -160,9 +160,9 @@ def main():
         """)
     else:
         import os
-        st.write(os.listdir())
-        st.write(os.getcwd())
-        # grid_search()
+        # st.write(os.listdir())
+        # st.write(os.getcwd())
+        grid_search()
 
 if __name__ == "__main__":
     main()
