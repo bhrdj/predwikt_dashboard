@@ -9,7 +9,7 @@ import streamlit as st
 #  import altair as alt
 import matplotlib.pyplot as plt
 
-@st.cache
+# @st.cache
 def load_data():
     # get data in memory
     infile = open('assets/disaster_daily_edits.pickle','rb') 
@@ -44,7 +44,7 @@ def load_data():
     calendar_cols = ['holiday_on_weekday','mtwtf','sat', 'sun',]
     return ts, list(disasters_english.values()), calendar_cols
 
-@st.cache
+# @st.cache
 def instantiate_results(counter):
     results = []
     return results
