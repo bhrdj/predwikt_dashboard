@@ -106,18 +106,14 @@ def model_fit(ts,p_AR_parameter,moving_average,target_names,calendar_cols):
         
     return gs_ri,scores,XX,YY,Xcols
 
-def grid_search():
+def grid_search():    
     # load data - should only happen once
     ts, target_names_default, calendar_cols = load_data()
-    
+
     st.title("Forecasting Tomorrow's Wikipedia Edits")
     st.markdown("#### (Manual Grid Search)")
     st.markdown("---")
-    st.write("Actual and Predicted Wikipedia Edits by Category")
-        
-    if all((i in locals() for i in ('result_dict', 'gs_ri','target_names','XX','YY','Xcols'))):
-        model_plot(result_dict, gs_ri,target_names,XX,YY,Xcols)
-
+    
     # user input
     with st.form("inputs"):
 
@@ -144,10 +140,15 @@ def grid_search():
     result_dict['moving_average'] = moving_average
 
     round_scores = {i:round(scores[i], 3) for i in scores}
+    
+    st.write("Actual and Predicted Wikipedia Edits by Category")
+    model_plot(result_dict, gs_ri,target_names,XX,YY,Xcols)
+
     st.write("Results: Quality of Fit")
     st.dataframe(pd.DataFrame(scores, index=['R²']))
     st.write("Results: Model Coefficients")
     st.dataframe(get_coeffs(gs_ri,target_names,p_AR_parameter,moving_average))
+
     
 def get_coeffs(gs_ri,target_names,p_AR_parameter,moving_average):
     coeffs = {}
