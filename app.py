@@ -109,7 +109,13 @@ def model_fit(ts,p_AR_parameter,moving_average,target_names,calendar_cols):
 def grid_search():
     # load data - should only happen once
     ts, target_names_default, calendar_cols = load_data()
-    st.title("Manual Grid Search")
+    
+    st.title("Forecasting Tomorrow's Wikipedia Edits")
+    st.markdown("#### (Manual Grid Search)")
+    st.markdown("---")
+    st.write("Actual and Predicted Wikipedia Edits by Category")
+    model_plot(result_dict, gs_ri,target_names,XX,YY,Xcols)
+
     # user input
     with st.form("inputs"):
 
@@ -135,16 +141,11 @@ def grid_search():
     result_dict['p_AR_parameter'] = p_AR_parameter
     result_dict['moving_average'] = moving_average
 
-    # for diz in target_names:
-    #     result_dict[diz+'_score'] = scores[diz]
-    #     st.write(f"{diz}: {scores[diz]:.2f}")
     round_scores = {i:round(scores[i], 3) for i in scores}
     st.write("Results: Quality of Fit")
     st.dataframe(pd.DataFrame(scores, index=['R²']))
     st.write("Results: Model Coefficients")
     st.dataframe(get_coeffs(gs_ri,target_names,p_AR_parameter,moving_average))
-    st.write("Actual and Predicted Wikipedia Edits by Category")
-    model_plot(result_dict, gs_ri,target_names,XX,YY,Xcols)
     
 def get_coeffs(gs_ri,target_names,p_AR_parameter,moving_average):
     coeffs = {}
@@ -171,18 +172,22 @@ def model_plot(result_dict, gs_ri,target_names,XX,YY,Xcols):
                   'SnowDamage':'gray', 
                   'Earthquake':'lightgreen', 
                   'Tsunami':'violet'}
-    fig, axes = plt.subplots(nrows=len(target_names), ncols= 1, 
-                             figsize=(8,8), sharex=True)
-    for diz,ax in zip(target_names,axes):
-        YY_pred = gs_ri[diz].best_estimator_.predict(XX[Xcols[diz]])
-        YY_pred = pd.Series(YY_pred, index=XX[Xcols[diz]].index, name="prediction")
-        actual, = ax.plot(YY[diz], color='gray', linestyle='dashed', alpha = .7)
-        predicted, = ax.plot(YY_pred, color=diz_colors[diz], alpha = 1)
-        ax.set_ylabel(diz)
-        ax.yaxis.label.set_color(diz_colors[diz])
-        ax.legend([actual, predicted], ['actual', 'predicted'])
-    plt.xticks(rotation = 90)
-    st.pyplot(fig)
+    
+    try:
+        fig, axes = plt.subplots(nrows=len(target_names), ncols= 1, 
+                                 figsize=(8,8), sharex=True)
+        for diz,ax in zip(target_names,axes):
+            YY_pred = gs_ri[diz].best_estimator_.predict(XX[Xcols[diz]])
+            YY_pred = pd.Series(YY_pred, index=XX[Xcols[diz]].index, name="prediction")
+            actual, = ax.plot(YY[diz], color='gray', linestyle='dashed', alpha = .7)
+            predicted, = ax.plot(YY_pred, color=diz_colors[diz], alpha = 1)
+            ax.set_ylabel(diz)
+            ax.yaxis.label.set_color(diz_colors[diz])
+            ax.legend([actual, predicted], ['actual', 'predicted'])
+        plt.xticks(rotation = 90)
+        st.pyplot(fig)
+    except Exception as e:
+        pass
 
 def main():
     # if page == 'Home':
