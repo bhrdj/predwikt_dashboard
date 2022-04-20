@@ -185,18 +185,17 @@ def model_plot(result_dict, gs_ri,target_names,XX,YY,Xcols):
     st.pyplot(fig)
 
 def main():
-    page = st.sidebar.selectbox('Choose your page',['Home','GridSearch'])
-    if page == 'Home':
-        st.title("Forecasting Wikipedia Edits")
-        st.markdown("""
-        Capstone Project  
-        Data Science 2021-2022  
-        General Assembly  
-        **Steven Bhardwaj**
-        """)
-    else:
-        import os
-        grid_search()
+    # if page == 'Home':
+    #     st.title("Forecasting Wikipedia Edits")
+    #     st.markdown("""
+    #     Capstone Project  
+    #     Data Science 2021-2022  
+    #     General Assembly  
+    #     **Steven Bhardwaj**
+    #     """)
+    # else:
+    #     import os
+    grid_search()
 
 if __name__ == "__main__":
     main()
