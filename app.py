@@ -114,7 +114,9 @@ def grid_search():
     st.markdown("#### (Manual Grid Search)")
     st.markdown("---")
     st.write("Actual and Predicted Wikipedia Edits by Category")
-    model_plot(result_dict, gs_ri,target_names,XX,YY,Xcols)
+    
+    if all(result_dict, gs_ri,target_names,XX,YY,Xcols):
+        model_plot(result_dict, gs_ri,target_names,XX,YY,Xcols)
 
     # user input
     with st.form("inputs"):
@@ -173,21 +175,18 @@ def model_plot(result_dict, gs_ri,target_names,XX,YY,Xcols):
                   'Earthquake':'lightgreen', 
                   'Tsunami':'violet'}
     
-    try:
-        fig, axes = plt.subplots(nrows=len(target_names), ncols= 1, 
-                                 figsize=(8,8), sharex=True)
-        for diz,ax in zip(target_names,axes):
-            YY_pred = gs_ri[diz].best_estimator_.predict(XX[Xcols[diz]])
-            YY_pred = pd.Series(YY_pred, index=XX[Xcols[diz]].index, name="prediction")
-            actual, = ax.plot(YY[diz], color='gray', linestyle='dashed', alpha = .7)
-            predicted, = ax.plot(YY_pred, color=diz_colors[diz], alpha = 1)
-            ax.set_ylabel(diz)
-            ax.yaxis.label.set_color(diz_colors[diz])
-            ax.legend([actual, predicted], ['actual', 'predicted'])
-        plt.xticks(rotation = 90)
-        st.pyplot(fig)
-    except Exception as e:
-        pass
+    fig, axes = plt.subplots(nrows=len(target_names), ncols= 1, 
+                             figsize=(8,8), sharex=True)
+    for diz,ax in zip(target_names,axes):
+        YY_pred = gs_ri[diz].best_estimator_.predict(XX[Xcols[diz]])
+        YY_pred = pd.Series(YY_pred, index=XX[Xcols[diz]].index, name="prediction")
+        actual, = ax.plot(YY[diz], color='gray', linestyle='dashed', alpha = .7)
+        predicted, = ax.plot(YY_pred, color=diz_colors[diz], alpha = 1)
+        ax.set_ylabel(diz)
+        ax.yaxis.label.set_color(diz_colors[diz])
+        ax.legend([actual, predicted], ['actual', 'predicted'])
+    plt.xticks(rotation = 90)
+    st.pyplot(fig)
 
 def main():
     # if page == 'Home':
