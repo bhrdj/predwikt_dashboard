@@ -115,7 +115,10 @@ def grid_search():
     st.markdown("---")
     st.write("Actual and Predicted Wikipedia Edits by Category")
     
-    if all(result_dict, gs_ri,target_names,XX,YY,Xcols):
+    if "variable1" in locals() and "variable2" in locals():
+    # do something
+    
+    if all((i in locals() for i in ('result_dict', 'gs_ri','target_names','XX','YY','Xcols'))):
         model_plot(result_dict, gs_ri,target_names,XX,YY,Xcols)
 
     # user input
