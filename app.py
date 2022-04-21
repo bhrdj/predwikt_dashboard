@@ -201,6 +201,7 @@ def main():
     # else:
     #     import os
     grid_search()
+    st.image('assets/data_flow.png')
 
 if __name__ == "__main__":
     main()
