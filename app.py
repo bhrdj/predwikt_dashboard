@@ -149,7 +149,6 @@ def grid_search():
     st.write("Results: Model Coefficients")
     st.dataframe(get_coeffs(gs_ri,target_names,p_AR_parameter,moving_average))
 
-    
 def get_coeffs(gs_ri,target_names,p_AR_parameter,moving_average):
     coeffs = {}
     AR_coeff_nums = list(range(1,p_AR_parameter+1))
@@ -163,7 +162,7 @@ def get_coeffs(gs_ri,target_names,p_AR_parameter,moving_average):
             index=coeff_names, 
             name=diz)
     return pd.DataFrame(coeffs)
-    
+
 def model_plot(result_dict, gs_ri,target_names,XX,YY,Xcols):
     diz_colors = {'VolcanicDisaster':'red', 
                   'TropicalCyclones':'blue', 
@@ -201,7 +200,18 @@ def main():
     # else:
     #     import os
     grid_search()
+    st.markdown('')
+    st.markdown('---')
+    st.markdown('')
     st.image('assets/data_flow.png')
+    st.markdown('')
+    st.markdown('---')
+    st.markdown('')
+    st.markdown("""
+    TODO:
+    - enable interactive querying of database from streamlit app
+    - utilize pageviews for predictions
+    """)
 
 if __name__ == "__main__":
     main()
